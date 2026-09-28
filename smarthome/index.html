@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AeroHome — Neumorphic Smart Home Control</title>
+  <meta name="description" content="Tactile dark mode smart home control interface featuring soft UI neumorphism, extruded matte charcoal surfaces, and glowing cyan LED indicators.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- App Shell -->
+  <div class="app-container">
+    
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button type="button" class="neu-btn-circle" id="btn-menu" aria-label="Open Navigation Menu">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        </button>
+        <div class="header-titles">
+          <h1 class="app-title">Smart Home</h1>
+          <span class="system-status"><span class="led-dot pulse"></span> <span id="txt-active-count">7 Devices Active</span> &bull; All Systems Nominal</span>
+        </div>
+      </div>
+
+      <div class="top-bar-right">
+        <!-- Quick Mode Selector -->
+        <div class="mode-pill-group">
+          <button type="button" class="neu-pill-btn active" data-scene="home">Home</button>
+          <button type="button" class="neu-pill-btn" data-scene="away">Away</button>
+          <button type="button" class="neu-pill-btn" data-scene="night">Night</button>
+        </div>
+
+        <button type="button" class="neu-btn-circle" id="btn-notifications" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notification-indicator"></span>
+        </button>
+
+        <button type="button" class="neu-btn-circle" id="btn-master-power" aria-label="Master Power">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid">
+
+      <!-- LEFT COLUMN: Quick Devices & Rooms -->
+      <section class="grid-column col-left">
+        
+        <div class="neu-card devices-card">
+          <div class="card-header">
+            <h2 class="card-title">Quick Access</h2>
+            <span class="card-tag">Living Room</span>
+          </div>
+
+          <div class="device-list">
+            
+            <!-- Device 1: Smart TV -->
+            <div class="neu-device-row">
+              <div class="device-meta">
+                <div class="device-icon-box">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                </div>
+                <div>
+                  <span class="device-name">Apple TV 4K</span>
+                  <span class="device-sub">Living Room &bull; HDMI 1</span>
+                </div>
+              </div>
+              <label class="neu-toggle" for="toggle-tv">
+                <input type="checkbox" id="toggle-tv" class="toggle-input" checked>
+                <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+              </label>
+            </div>
+
+            <!-- Device 2: Smart Blinds -->
+            <div class="neu-device-row">
+              <div class="device-meta">
+                <div class="device-icon-box">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+                </div>
+                <div>
+                  <span class="device-name">Motorized Blinds</span>
+                  <span class="device-sub" id="txt-blinds-status">Open 80%</span>
+                </div>
+              </div>
+              <div class="neu-stepper-duo">
+                <button type="button" class="neu-stepper-btn" id="btn-blinds-down" title="Lower Blinds">&darr;</button>
+                <button type="button" class="neu-stepper-btn" id="btn-blinds-up" title="Raise Blinds">&uarr;</button>
+              </div>
+            </div>
+
+            <!-- Device 3: Smart Lock -->
+            <div class="neu-device-row">
+              <div class="device-meta">
+                <div class="device-icon-box" id="icon-lock">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div>
+                  <span class="device-name">Front Door Lock</span>
+                  <span class="device-sub" id="txt-lock-status">Secured &bull; Battery 94%</span>
+                </div>
+              </div>
+              <label class="neu-toggle" for="toggle-lock">
+                <input type="checkbox" id="toggle-lock" class="toggle-input" checked>
+                <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+              </label>
+            </div>
+
+            <!-- Device 4: Air Purifier -->
+            <div class="neu-device-row">
+              <div class="device-meta">
+                <div class="device-icon-box">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                </div>
+                <div>
+                  <span class="device-name">Air Purifier</span>
+                  <span class="device-sub">HEPA Auto &bull; PM2.5: 8 &micro;g</span>
+                </div>
+              </div>
+              <label class="neu-toggle" for="toggle-purifier">
+                <input type="checkbox" id="toggle-purifier" class="toggle-input" checked>
+                <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Ambient Environmental Status Card -->
+        <div class="neu-card metrics-card">
+          <div class="card-header">
+            <h2 class="card-title">Indoor Environment</h2>
+          </div>
+          <div class="metric-tiles-grid">
+            <div class="neu-sunken-tile">
+              <span class="tile-label">Humidity</span>
+              <span class="tile-val" id="val-humidity">48%</span>
+              <span class="tile-badge cyan">Optimal</span>
+            </div>
+            <div class="neu-sunken-tile">
+              <span class="tile-label">Air Quality</span>
+              <span class="tile-val">98</span>
+              <span class="tile-badge cyan">AQI Excellent</span>
+            </div>
+            <div class="neu-sunken-tile">
+              <span class="tile-label">Power Draw</span>
+              <span class="tile-val" id="val-power">1.38 kW</span>
+              <span class="tile-badge">Normal</span>
+            </div>
+            <div class="neu-sunken-tile">
+              <span class="tile-label">Wi-Fi Mesh</span>
+              <span class="tile-val">940 Mbps</span>
+              <span class="tile-badge cyan">6 GHz Ultra</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- CENTER COLUMN: Primary Controls (Climate & Lighting) -->
+      <section class="grid-column col-center">
+        
+        <!-- Climate & Thermostat Card -->
+        <div class="neu-card climate-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Temperature Control</h2>
+              <span class="card-sub">Central Heat Pump &bull; Living Area</span>
+            </div>
+            <div class="temp-unit-toggle">
+              <button type="button" class="unit-btn active" id="btn-deg-f">&deg;F</button>
+              <button type="button" class="unit-btn" id="btn-deg-c">&deg;C</button>
+            </div>
+          </div>
+
+          <div class="climate-body">
+            <!-- Stepper Minus -->
+            <button type="button" class="neu-btn-circular-stepper" id="btn-temp-minus" aria-label="Decrease Temperature">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+
+            <!-- Big Temperature Hero Readout -->
+            <div class="temperature-hero">
+              <span class="temp-number" id="txt-temperature">72</span>
+              <span class="temp-degree">&deg;</span>
+              <span class="temp-mode-sub" id="txt-climate-mode">Cooling to 72&deg;F</span>
+            </div>
+
+            <!-- Stepper Plus -->
+            <button type="button" class="neu-btn-circular-stepper" id="btn-temp-plus" aria-label="Increase Temperature">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+
+          <!-- Tactile Sunken Temperature Slider -->
+          <div class="slider-container">
+            <div class="slider-meta">
+              <span>60&deg;</span>
+              <span id="slider-target-label">Target Setpoint</span>
+              <span>85&deg;</span>
+            </div>
+            <div class="neu-slider-track" id="temp-slider-track">
+              <div class="neu-slider-fill" id="temp-slider-fill" style="width: 48%;"></div>
+              <div class="neu-slider-thumb" id="temp-slider-thumb" style="left: 48%;">
+                <span class="thumb-led"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- HVAC Mode Chips -->
+          <div class="hvac-modes">
+            <button type="button" class="neu-chip-btn active" data-hvac="cool">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/></svg>
+              <span>Cool</span>
+            </button>
+            <button type="button" class="neu-chip-btn" data-hvac="heat">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c2 3 4 5 4 8a4 4 0 0 1-8 0c0-3 2-5 4-8z"/><path d="M12 14v8"/></svg>
+              <span>Heat</span>
+            </button>
+            <button type="button" class="neu-chip-btn" data-hvac="eco">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+              <span>Eco</span>
+            </button>
+            <button type="button" class="neu-chip-btn" data-hvac="fan">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 12c0-3 2.5-5 5-5s3 3 1 6-6 0-6-1z"/></svg>
+              <span>Auto</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lighting & Dimmer Card -->
+        <div class="neu-card lighting-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Lighting &amp; Ambience</h2>
+              <span class="card-sub">Multi-Zone Luminaire Controls</span>
+            </div>
+            <button type="button" class="neu-pill-btn-sm" id="btn-lights-all">All Off</button>
+          </div>
+
+          <div class="lighting-layout">
+            
+            <!-- Room Lights Switch Stack -->
+            <div class="light-switch-stack">
+              <div class="light-row">
+                <span class="light-room-name">Living Room</span>
+                <label class="neu-toggle" for="toggle-light-living">
+                  <input type="checkbox" id="toggle-light-living" class="toggle-input" checked>
+                  <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+                </label>
+              </div>
+
+              <div class="light-row">
+                <span class="light-room-name">Kitchen Island</span>
+                <label class="neu-toggle" for="toggle-light-kitchen">
+                  <input type="checkbox" id="toggle-light-kitchen" class="toggle-input">
+                  <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+                </label>
+              </div>
+
+              <div class="light-row">
+                <span class="light-room-name">Master Bedroom</span>
+                <label class="neu-toggle" for="toggle-light-bed">
+                  <input type="checkbox" id="toggle-light-bed" class="toggle-input" checked>
+                  <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+                </label>
+              </div>
+
+              <div class="light-row">
+                <span class="light-room-name">Patio &amp; Garden</span>
+                <label class="neu-toggle" for="toggle-light-patio">
+                  <input type="checkbox" id="toggle-light-patio" class="toggle-input">
+                  <span class="toggle-track"><span class="toggle-thumb"><span class="toggle-led"></span></span></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Rotary Dimmer Dial -->
+            <div class="rotary-dimmer-wrap">
+              <div class="rotary-dial" id="rotary-dial">
+                <!-- SVG Glow Track -->
+                <svg class="rotary-svg" viewBox="0 0 160 160">
+                  <circle class="dial-bg-arc" cx="80" cy="80" r="62"/>
+                  <circle class="dial-glow-arc" id="dial-glow-arc" cx="80" cy="80" r="62"/>
+                </svg>
+
+                <!-- Extruded Center Knob -->
+                <div class="rotary-knob" id="rotary-knob">
+                  <div class="knob-bezel">
+                    <span class="knob-notch" id="knob-notch"></span>
+                  </div>
+                  <div class="knob-readout">
+                    <span class="dim-pct" id="val-dim-pct">75%</span>
+                    <span class="dim-label">Dimmer</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rotary-presets">
+                <button type="button" class="neu-preset-btn" data-dim="25">25%</button>
+                <button type="button" class="neu-preset-btn" data-dim="50">50%</button>
+                <button type="button" class="neu-preset-btn active" data-dim="75">75%</button>
+                <button type="button" class="neu-preset-btn" data-dim="100">100%</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: Entertainment, Scenes & System -->
+      <section class="grid-column col-right">
+        
+        <!-- Media / Music Player Card -->
+        <div class="neu-card music-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Audio &amp; Media</h2>
+              <span class="card-sub">AirPlay &bull; Living Room Hi-Fi</span>
+            </div>
+            <button type="button" class="neu-btn-circle-sm" id="btn-audio-more" aria-label="Audio Options">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+            </button>
+          </div>
+
+          <div class="media-body">
+            <!-- Simulated Album Vinyl / Art Display -->
+            <div class="album-art-sunken">
+              <div class="album-vinyl-groove" id="vinyl-disc">
+                <div class="vinyl-center-art">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#00f2fe" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+              </div>
+              <div class="track-details">
+                <span class="track-title" id="track-title">Midnight City</span>
+                <span class="track-artist" id="track-artist">M83 &bull; Hurry Up, We're Dreaming</span>
+                <span class="track-codec">Lossless 24-bit / 96kHz</span>
+              </div>
+            </div>
+
+            <!-- Track Progress Bar -->
+            <div class="track-timeline">
+              <div class="neu-progress-sunken" id="music-progress-bar">
+                <div class="neu-progress-fill" id="music-progress-fill" style="width: 42%;"></div>
+              </div>
+              <div class="time-row">
+                <span id="txt-time-cur">1:42</span>
+                <span id="txt-time-dur">4:04</span>
+              </div>
+            </div>
+
+            <!-- Extruded Media Transport Controls -->
+            <div class="media-transport">
+              <button type="button" class="neu-btn-transport" id="btn-shuffle" title="Shuffle">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+              </button>
+
+              <button type="button" class="neu-btn-transport" id="btn-prev-track" title="Previous Track">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+              </button>
+
+              <button type="button" class="neu-btn-transport-play" id="btn-play-pause" title="Play / Pause">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" id="icon-play-state"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+
+              <button type="button" class="neu-btn-transport" id="btn-next-track" title="Next Track">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+              </button>
+
+              <button type="button" class="neu-btn-transport" id="btn-repeat" title="Repeat">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </button>
+            </div>
+
+            <!-- Volume Sunken Slider -->
+            <div class="volume-row">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
+              <div class="neu-slider-track volume-track" id="vol-slider-track">
+                <div class="neu-slider-fill" id="vol-slider-fill" style="width: 65%;"></div>
+                <div class="neu-slider-thumb" id="vol-slider-thumb" style="left: 65%;">
+                  <span class="thumb-led"></span>
+                </div>
+              </div>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Quick Scene Launcher Card -->
+        <div class="neu-card scenes-card">
+          <div class="card-header">
+            <h2 class="card-title">Ambience Scenes</h2>
+          </div>
+          <div class="scene-buttons-grid">
+            <button type="button" class="neu-scene-tile active" data-scene-trigger="cinema">
+              <span class="scene-icon">🎬</span>
+              <span class="scene-title">Cinema</span>
+              <span class="scene-desc">Dim to 20% &bull; AC 70&deg;</span>
+            </button>
+            <button type="button" class="neu-scene-tile" data-scene-trigger="focus">
+              <span class="scene-icon">💡</span>
+              <span class="scene-title">Focus</span>
+              <span class="scene-desc">Pure White &bull; 85%</span>
+            </button>
+            <button type="button" class="neu-scene-tile" data-scene-trigger="relax">
+              <span class="scene-icon">☕</span>
+              <span class="scene-title">Relax</span>
+              <span class="scene-desc">Warm Amber &bull; Lo-Fi</span>
+            </button>
+            <button type="button" class="neu-scene-tile" data-scene-trigger="bedtime">
+              <span class="scene-icon">🌙</span>
+              <span class="scene-title">Bedtime</span>
+              <span class="scene-desc">Doors Lock &bull; All Off</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Bottom Fixed Neumorphic Dock / Navigation -->
+    <nav class="neu-bottom-dock" aria-label="Room Navigation">
+      <div class="dock-inner">
+        <button type="button" class="dock-btn active" data-room="all" aria-label="Dashboard Overview">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span class="dock-tooltip">Overview</span>
+        </button>
+        <button type="button" class="dock-btn" data-room="living" aria-label="Living Room">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+          <span class="dock-tooltip">Living</span>
+        </button>
+        <button type="button" class="dock-btn" data-room="bed" aria-label="Master Bedroom">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/></svg>
+          <span class="dock-tooltip">Bedroom</span>
+        </button>
+        <button type="button" class="dock-btn" data-room="kitchen" aria-label="Kitchen">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          <span class="dock-tooltip">Kitchen</span>
+        </button>
+        <button type="button" class="dock-btn" data-room="settings" aria-label="System Settings">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="dock-tooltip">Settings</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

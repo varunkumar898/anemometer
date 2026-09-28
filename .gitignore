@@ -1,0 +1,18 @@
+# Build output
+build/
+bin/
+obj/
+*.o
+*.elf
+*.bin
+*.hex
+*.exe
+*.map
+
+# Test / Runtime artifacts
+calib_storage.bin
+
+# IDE and OS files
+.vscode/
+.DS_Store
+Thumbs.db
