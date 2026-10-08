@@ -2,7 +2,7 @@
 
 A portable, modular **Bare-Metal C** implementation of the Industrial Wind Monitoring System (MCP3426 16-bit Delta-Sigma I2C ADC + MAX7219 7-Segment Display + Dual Cutoff Interlocks).
 
-This firmware contains no Arduino dependencies or heavyweight operating system overhead, featuring a **Hardware Abstraction Layer (HAL)**, direct peripheral drivers, standard C math, and a responsive **Serial UART Command-Line Interface (CLI)**.
+This firmware contains featuring a **Hardware Abstraction Layer (HAL)**, direct peripheral drivers, standard C math, and a responsive **Serial UART Command-Line Interface (CLI)**.
 
 ---
 
